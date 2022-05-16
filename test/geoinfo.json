@@ -1,1 +1,275 @@
-{"type": "FeatureCollection", "features": [{"bbox": [-102.280104, 21.879026, -102.262041, 21.886795], "type": "Feature", "properties": {"segments": [{"distance": 2639.7, "duration": 1900.6, "steps": [{"distance": 5.1, "duration": 3.7, "type": 11, "instruction": "Head southeast on Avenida Tecnol\u00f3gico", "name": "Avenida Tecnol\u00f3gico", "way_points": [0, 1]}, {"distance": 15.2, "duration": 10.9, "type": 0, "instruction": "Turn left onto Avenida Licenciado Adolfo L\u00f3pez Mateos Oriente, MEX 70", "name": "Avenida Licenciado Adolfo L\u00f3pez Mateos Oriente, MEX 70", "way_points": [1, 2]}, {"distance": 177.9, "duration": 128.1, "type": 2, "instruction": "Turn sharp left onto Avenida Tecnol\u00f3gico", "name": "Avenida Tecnol\u00f3gico", "way_points": [2, 6]}, {"distance": 441.8, "duration": 318.1, "type": 13, "instruction": "Keep right onto Avenida Tecnol\u00f3gico", "name": "Avenida Tecnol\u00f3gico", "way_points": [6, 11]}, {"distance": 290.2, "duration": 209.0, "type": 0, "instruction": "Turn left onto 20 de Noviembre", "name": "20 de Noviembre", "way_points": [11, 12]}, {"distance": 296.8, "duration": 213.7, "type": 1, "instruction": "Turn right onto Avenida Tecnol\u00f3gico", "name": "Avenida Tecnol\u00f3gico", "way_points": [12, 22]}, {"distance": 32.8, "duration": 23.6, "type": 12, "instruction": "Keep left", "name": "-", "way_points": [22, 25]}, {"distance": 28.9, "duration": 20.8, "type": 12, "instruction": "Keep left", "name": "-", "way_points": [25, 27]}, {"distance": 385.7, "duration": 277.7, "type": 0, "instruction": "Turn left onto Calle Beethoven", "name": "Calle Beethoven", "way_points": [27, 35]}, {"distance": 137.9, "duration": 99.3, "type": 0, "instruction": "Turn left onto Calle 57", "name": "Calle 57", "way_points": [35, 40]}, {"distance": 106.0, "duration": 76.3, "type": 1, "instruction": "Turn right onto Calle Calder\u00f3n", "name": "Calle Calder\u00f3n", "way_points": [40, 41]}, {"distance": 408.2, "duration": 293.9, "type": 0, "instruction": "Turn left onto Calle 1810", "name": "Calle 1810", "way_points": [41, 48]}, {"distance": 19.5, "duration": 14.1, "type": 1, "instruction": "Turn right", "name": "-", "way_points": [48, 49]}, {"distance": 56.9, "duration": 41.0, "type": 0, "instruction": "Turn left", "name": "-", "way_points": [49, 51]}, {"distance": 11.6, "duration": 8.3, "type": 4, "instruction": "Turn slight left", "name": "-", "way_points": [51, 53]}, {"distance": 89.7, "duration": 64.6, "type": 1, "instruction": "Turn right", "name": "-", "way_points": [53, 60]}, {"distance": 17.3, "duration": 12.5, "type": 1, "instruction": "Turn right", "name": "-", "way_points": [60, 62]}, {"distance": 22.7, "duration": 16.3, "type": 12, "instruction": "Keep left", "name": "-", "way_points": [62, 63]}, {"distance": 49.5, "duration": 35.6, "type": 4, "instruction": "Turn slight left", "name": "-", "way_points": [63, 66]}, {"distance": 46.0, "duration": 33.1, "type": 2, "instruction": "Turn sharp left onto Avenida Manuel G\u00f3mez Mor\u00edn", "name": "Avenida Manuel G\u00f3mez Mor\u00edn", "way_points": [66, 67]}, {"distance": 0.0, "duration": 0.0, "type": 10, "instruction": "Arrive at Avenida Manuel G\u00f3mez Mor\u00edn, on the right", "name": "-", "way_points": [67, 67]}]}], "summary": {"distance": 2639.7, "duration": 1900.6}, "way_points": [0, 67]}, "geometry": {"coordinates": [[-102.262164, 21.879031], [-102.262158, 21.879026], [-102.262041, 21.879109], [-102.262405, 21.879378], [-102.26255, 21.879486], [-102.262662, 21.879567], [-102.263391, 21.880104], [-102.263515, 21.880395], [-102.263921, 21.88134], [-102.264357, 21.882234], [-102.264771, 21.883138], [-102.265087, 21.883751], [-102.267688, 21.882757], [-102.267815, 21.882834], [-102.268183, 21.883049], [-102.269168, 21.883624], [-102.269821, 21.883997], [-102.269876, 21.884041], [-102.269888, 21.884056], [-102.269898, 21.884067], [-102.269938, 21.884151], [-102.269952, 21.884224], [-102.269962, 21.88429], [-102.269943, 21.88437], [-102.269874, 21.88456], [-102.269873, 21.884572], [-102.269876, 21.884689], [-102.269886, 21.884832], [-102.269977, 21.884885], [-102.270761, 21.885379], [-102.270957, 21.885495], [-102.271222, 21.885651], [-102.271323, 21.885715], [-102.272094, 21.886206], [-102.272451, 21.886427], [-102.272966, 21.886795], [-102.273048, 21.886731], [-102.27328, 21.886405], [-102.27351, 21.886114], [-102.273553, 21.886018], [-102.273748, 21.885798], [-102.274603, 21.886327], [-102.274983, 21.885817], [-102.275073, 21.885757], [-102.275162, 21.885736], [-102.276573, 21.885313], [-102.277491, 21.885057], [-102.277723, 21.885], [-102.278112, 21.884902], [-102.278201, 21.885057], [-102.278514, 21.884977], [-102.27874, 21.884955], [-102.278795, 21.884914], [-102.27881, 21.884878], [-102.279057, 21.884905], [-102.279247, 21.884916], [-102.279388, 21.884927], [-102.279425, 21.88493], [-102.279462, 21.884928], [-102.279494, 21.884919], [-102.279648, 21.884832], [-102.279686, 21.884899], [-102.279692, 21.884978], [-102.279799, 21.885156], [-102.279833, 21.885166], [-102.27998, 21.885397], [-102.280104, 21.885484], [-102.279902, 21.885115]], "type": "LineString"}}], "bbox": [-102.280104, 21.879026, -102.262041, 21.886795], "metadata": {"attribution": "openrouteservice.org | OpenStreetMap contributors", "service": "routing", "timestamp": 1652665000477, "query": {"coordinates": [[-102.262161, 21.879035], [-102.279924, 21.885105]], "profile": "foot-walking", "format": "geojson"}, "engine": {"version": "6.7.0", "build_date": "2022-02-18T19:37:41Z", "graph_date": "2022-05-03T06:30:15Z"}}}
+{"type": "FeatureCollection", "features": [
+    {
+        "bbox": [-102.280104, 21.879026, -102.262041, 21.886795], 
+        "type": "Feature", 
+        "properties": {
+            "segments": [
+                {
+                    "distance": 2639.7, 
+                    "duration": 1900.6, 
+                    "steps": [
+                    {
+                        "distance": 5.1, 
+                        "duration": 3.7, 
+                        "type": 11, 
+                        "instruction": "Head southeast on Avenida Tecnol\u00f3gico", 
+                        "name": "Avenida Tecnol\u00f3gico", 
+                        "way_points": [0, 1]
+                    }, 
+                    {
+                        "distance": 15.2, 
+                        "duration": 10.9, 
+                        "type": 0, 
+                        "instruction": "Turn left onto Avenida Licenciado Adolfo L\u00f3pez Mateos Oriente, MEX 70", 
+                        "name": "Avenida Licenciado Adolfo L\u00f3pez Mateos Oriente, MEX 70", 
+                        "way_points": [1, 2]
+                    }, 
+                    {
+                        "distance": 177.9, 
+                        "duration": 128.1, 
+                        "type": 2, 
+                        "instruction": "Turn sharp left onto Avenida Tecnol\u00f3gico", 
+                        "name": "Avenida Tecnol\u00f3gico", 
+                        "way_points": [2, 6]
+                    }, 
+                    {
+                        "distance": 441.8, 
+                        "duration": 318.1, 
+                        "type": 13, 
+                        "instruction": "Keep right onto Avenida Tecnol\u00f3gico", 
+                        "name": "Avenida Tecnol\u00f3gico", 
+                        "way_points": [6, 11]
+                    }, 
+                    {
+                        "distance": 290.2, 
+                        "duration": 209.0, 
+                        "type": 0, 
+                        "instruction": "Turn left onto 20 de Noviembre", 
+                        "name": "20 de Noviembre", 
+                        "way_points": [11, 12]
+                    }, 
+                    {
+                        "distance": 296.8, 
+                        "duration": 213.7, 
+                        "type": 1, 
+                        "instruction": "Turn right onto Avenida Tecnol\u00f3gico", 
+                        "name": "Avenida Tecnol\u00f3gico", 
+                        "way_points": [12, 22]
+                    }, 
+                    {
+                        "distance": 32.8, 
+                        "duration": 23.6, 
+                        "type": 12, 
+                        "instruction": "Keep left", 
+                        "name": "-", 
+                        "way_points": [22, 25]
+                    }, 
+                    {
+                        "distance": 28.9, 
+                        "duration": 20.8, 
+                        "type": 12, 
+                        "instruction": "Keep left", 
+                        "name": "-", 
+                        "way_points": [25, 27]
+                    },
+                    {
+                        "distance": 385.7, 
+                        "duration": 277.7, 
+                        "type": 0, 
+                        "instruction": "Turn left onto Calle Beethoven", 
+                        "name": "Calle Beethoven", "way_points": [27, 35]
+                    },
+                    {
+                        "distance": 137.9, 
+                        "duration": 99.3, 
+                        "type": 0, 
+                        "instruction": "Turn left onto Calle 57", 
+                        "name": "Calle 57", 
+                        "way_points": [35, 40]
+                    },
+                    {
+                        "distance": 106.0, 
+                        "duration": 76.3, 
+                        "type": 1, 
+                        "instruction": "Turn right onto Calle Calder\u00f3n", 
+                        "name": "Calle Calder\u00f3n", 
+                        "way_points": [40, 41]
+                    }, 
+                    {
+                        "distance": 408.2, 
+                        "duration": 293.9, 
+                        "type": 0, 
+                        "instruction": "Turn left onto Calle 1810", 
+                        "name": "Calle 1810", 
+                        "way_points": [41, 48]
+                    }, 
+                    {
+                        "distance": 19.5, 
+                        "duration": 14.1, 
+                        "type": 1, 
+                        "instruction": "Turn right", 
+                        "name": "-", 
+                        "way_points": [48, 49]
+                    }, 
+                    {
+                        "distance": 56.9, 
+                        "duration": 41.0, 
+                        "type": 0, 
+                        "instruction": "Turn left", 
+                        "name": "-", 
+                        "way_points": [49, 51]
+                    }, 
+                    {
+                        "distance": 11.6, 
+                        "duration": 8.3, 
+                        "type": 4, 
+                        "instruction": "Turn slight left", 
+                        "name": "-", 
+                        "way_points": [51, 53]
+                    }, 
+                    {
+                        "distance": 89.7, 
+                        "duration": 64.6, 
+                        "type": 1, 
+                        "instruction": "Turn right", 
+                        "name": "-", 
+                        "way_points": [53, 60]
+                    }, 
+                    {
+                        "distance": 17.3, 
+                        "duration": 12.5, 
+                        "type": 1, 
+                        "instruction": "Turn right", 
+                        "name": "-", 
+                        "way_points": [60, 62]
+                    }, 
+                    {
+                        "distance": 22.7, 
+                        "duration": 16.3, 
+                        "type": 12, 
+                        "instruction": "Keep left", 
+                        "name": "-", 
+                        "way_points": [62, 63]
+                    }, 
+                    {
+                        "distance": 49.5, 
+                        "duration": 35.6, 
+                        "type": 4, 
+                        "instruction": "Turn slight left", 
+                        "name": "-", 
+                        "way_points": [63, 66]
+                    }, 
+                    {
+                        "distance": 46.0, 
+                        "duration": 33.1, 
+                        "type": 2, 
+                        "instruction": "Turn sharp left onto Avenida Manuel G\u00f3mez Mor\u00edn", 
+                        "name": "Avenida Manuel G\u00f3mez Mor\u00edn", 
+                        "way_points": [66, 67]
+                    }, 
+                    {
+                        "distance": 0.0, 
+                        "duration": 0.0, 
+                        "type": 10, 
+                        "instruction": "Arrive at Avenida Manuel G\u00f3mez Mor\u00edn, on the right", 
+                        "name": "-", "way_points": [67, 67]
+                    }
+                    ]
+                }
+            ], 
+            "summary": {
+                "distance": 2639.7, 
+                "duration": 1900.6
+            }, 
+            "way_points": [0, 67]
+        }, 
+        "geometry": {
+            "coordinates": [
+                [-102.262164, 21.879031], 
+                [-102.262158, 21.879026], 
+                [-102.262041, 21.879109], 
+                [-102.262405, 21.879378], 
+                [-102.26255, 21.879486], 
+                [-102.262662, 21.879567], 
+                [-102.263391, 21.880104], 
+                [-102.263515, 21.880395], 
+                [-102.263921, 21.88134], 
+                [-102.264357, 21.882234], 
+                [-102.264771, 21.883138], 
+                [-102.265087, 21.883751], 
+                [-102.267688, 21.882757], 
+                [-102.267815, 21.882834], 
+                [-102.268183, 21.883049], 
+                [-102.269168, 21.883624], 
+                [-102.269821, 21.883997],
+                [-102.269876, 21.884041], 
+                [-102.269888, 21.884056], 
+                [-102.269898, 21.884067], 
+                [-102.269938, 21.884151], 
+                [-102.269952, 21.884224], 
+                [-102.269962, 21.88429], 
+                [-102.269943, 21.88437], 
+                [-102.269874, 21.88456], 
+                [-102.269873, 21.884572], 
+                [-102.269876, 21.884689], 
+                [-102.269886, 21.884832], 
+                [-102.269977, 21.884885], 
+                [-102.270761, 21.885379], 
+                [-102.270957, 21.885495], 
+                [-102.271222, 21.885651], 
+                [-102.271323, 21.885715], 
+                [-102.272094, 21.886206], 
+                [-102.272451, 21.886427], 
+                [-102.272966, 21.886795], 
+                [-102.273048, 21.886731], 
+                [-102.27328, 21.886405], 
+                [-102.27351, 21.886114], 
+                [-102.273553, 21.886018], 
+                [-102.273748, 21.885798], 
+                [-102.274603, 21.886327], 
+                [-102.274983, 21.885817], 
+                [-102.275073, 21.885757], 
+                [-102.275162, 21.885736], 
+                [-102.276573, 21.885313], 
+                [-102.277491, 21.885057], 
+                [-102.277723, 21.885], 
+                [-102.278112, 21.884902], 
+                [-102.278201, 21.885057], 
+                [-102.278514, 21.884977], 
+                [-102.27874, 21.884955], 
+                [-102.278795, 21.884914], 
+                [-102.27881, 21.884878], 
+                [-102.279057, 21.884905], 
+                [-102.279247, 21.884916], 
+                [-102.279388, 21.884927], 
+                [-102.279425, 21.88493], 
+                [-102.279462, 21.884928], 
+                [-102.279494, 21.884919], 
+                [-102.279648, 21.884832], 
+                [-102.279686, 21.884899], 
+                [-102.279692, 21.884978], 
+                [-102.279799, 21.885156], 
+                [-102.279833, 21.885166], 
+                [-102.27998, 21.885397], 
+                [-102.280104, 21.885484], 
+                [-102.279902, 21.885115]
+            ], "type": "LineString"
+        }
+    }
+], 
+"bbox": [-102.280104, 21.879026, -102.262041, 21.886795], 
+"metadata": {
+        "attribution": "openrouteservice.org | OpenStreetMap contributors", 
+        "service": "routing", 
+        "timestamp": 1652665000477, 
+        "query": {
+            "coordinates": [[-102.262161, 21.879035], [-102.279924, 21.885105]], 
+            "profile": "foot-walking", 
+            "format": "geojson"
+        }, 
+    "engine": {
+        "version": "6.7.0", 
+        "build_date": "2022-02-18T19:37:41Z", 
+        "graph_date": "2022-05-03T06:30:15Z"
+    }
+}}
