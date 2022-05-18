@@ -4,6 +4,7 @@
 # el archivo yml
 
 import openrouteservice as ors  # importamos la libreria con un sobrenombre
+import json
 
 geojson = {
     "type":"point",
@@ -20,7 +21,9 @@ pois = client.places(
     geojson=geojson, # archivo o variable con la informacion
     buffer=2000, # rango de metros en diametro del area de busqueda
     # hospital: 206, restaurant: 570
-    filter_category_ids=[206, 570]
+    filter_category_ids=[206]
 )
 
+with open('test/pois.json', 'w') as f:
+    json.dump(pois, f) # vertimos la informacion en el archivo json
 print(pois)

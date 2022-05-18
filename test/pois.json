@@ -1,0 +1,87 @@
+{
+    "type": "FeatureCollection", 
+    "bbox": [-102.27383, 21.871039, -102.245478, 21.884638], 
+    "features": [
+        {
+            "type": "Feature", 
+            "geometry": {
+                "type": "Point", 
+                "coordinates": [-102.27383, 21.884638]
+            }, 
+            "properties": {
+                "osm_id": 885405617, 
+                "osm_type": 2, 
+                "distance": 1356.23618674, 
+                "category_ids": 
+                {
+                    "206": {
+                        "category_name": "hospital", 
+                        "category_group": "healthcare"
+                    }
+                }, 
+                "osm_tags": {
+                    "name": "IMSS Clinica 8"
+                }
+            }
+        }, 
+        {
+            "type": "Feature", 
+            "geometry": {
+                "type": "Point", 
+                "coordinates": [-102.254668, 21.877017]
+            }, 
+            "properties": {
+                "osm_id": 1333677058, 
+                "osm_type": 1, 
+                "distance": 806.00266578, 
+                "category_ids": {
+                    "206": {
+                        "category_name": "hospital", 
+                        "category_group": "healthcare"
+                    }
+                }, 
+                "osm_tags": {
+                    "name": "IMSS Clinica 2"
+                }
+            }
+        }, 
+        {
+            "type": "Feature", 
+            "geometry": {
+                "type": "Point", 
+                "coordinates": [-102.245478, 21.871039]
+            }, 
+            "properties": {
+                "osm_id": 1349274647, 
+                "osm_type": 1, 
+                "distance": 1938.31638364, 
+                "category_ids": {
+                    "206": {
+                        "category_name": "hospital", 
+                        "category_group": "healthcare"
+                    }
+                }, 
+                "osm_tags": {
+                    "name": "CMF Ojocaliente"
+                }
+            }
+        }
+    ], 
+    "information": {
+        "attribution": "openrouteservice.org | OpenStreetMap contributors", 
+        "version": "0.1", 
+        "timestamp": 1652800962, 
+        "query": {
+            "request": "pois", 
+            "filters": {
+                "category_ids": [206]
+            }, 
+            "geometry": {
+                "geojson": {
+                    "type": "point", 
+                    "coordinates": [-102.262161, 21.879035]
+                }, "buffer": 2000
+            }
+        }
+    }
+}
