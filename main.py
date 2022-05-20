@@ -54,6 +54,35 @@ geojson = {
 # coordenadas variables de nuestra posicion gps
 coordinates = [-102.262161, 21.879035]
 
+def distancia(): 
+
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(2,GPIO.OUT)
+    GPIO.setup(20,GPIO.IN)
+    GPIO.output(2,GPIO.LOW)
+
+    try: 
+        while True:
+            GPIO.output(2,GPIO.HIGH)
+            time.sleep(0.00001)
+            GPIO.output(2,GPIO.LOW)
+            t1 = time.time()
+            while GPIO.input(20) == GPIO.LOW:
+                t1 = time.time() 
+            while GPIO.input(20) == GPIO.HIGH:
+                t2 = time.time()
+            t = t2 - t1
+            d = 170 * t
+            print("Distancia: ", round(d,1), "metros")
+
+        
+
+            time.sleep(5)
+
+    except: 
+        GPIO.cleanup()
+        print("Ha salido de modo sensado de distancia")
+
 def Talk(message):
     # como parte de la interfaz de usuario se, usa la funcion pra que el motor de voz
     # pueda decir la informacion de salida de nuestro software, este necesita recibir
@@ -134,6 +163,9 @@ def getInstrucciones(features):
         Talk(getPasos(steps[i]))
 
 if __name__ == "__main__":
+
+    hilo = th.Thread(target=distancia)
+    hilo.start()
     #mensaje = Listener()
 
     # preguntamos que es lo que desea buscar
