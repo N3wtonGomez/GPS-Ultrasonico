@@ -10,7 +10,9 @@
 # 
 # derechos reservados para Tomorrowlab inc.
 
-
+# esta libreria nos permite escuchar a traves del microfono
+# para poder reconocer palabras y convertilas a texto
+import speech_recognition as sr
 # libreria que realiza la busqueda de los puntos de interes
 # ademas de generar la lista de indicaciones a traves de un geojson
 import openrouteservice as ors
@@ -74,14 +76,34 @@ def distancia():
             t = t2 - t1
             d = 170 * t
             print("Distancia: ", round(d,1), "metros")
-
-        
-
             time.sleep(5)
 
     except: 
         GPIO.cleanup()
         print("Ha salido de modo sensado de distancia")
+
+def getSpeech():
+    # esta funcion utiliza el microfono activo de la raspb
+    # para poder entender lo que dice la persona
+    listener = sr.Recognizer() # inicializamos el engine
+    # debemmos ingresar la funcion dentro de un try:catch
+    try:
+        # con el microfono como fuente empezamos a escuchar
+        with sr.Microphone() as source:
+            # agregamos un filtro al ruido del ambiente
+            pc = listener.adjust_for_ambient_noise(source)
+            # usamos el reconocedor de bing, pues el de google
+            # ya no puede ser usado de manera gratuita
+            rec = listener.recognize_bing(
+                pc, # queremos escuchar el ruido con filtro
+                lenguage = "es" # le decimos que queremos escuchar en españól
+            )
+            # nos devolverá un string, lo que pondremos en letras minusculas
+            # y devolvemos esta informacion 
+            return rec.lower() 
+    except Exception as e:
+        # si no se entiende lo que dice, o no funciona, se retorna el mensaje 
+        return "no te entendí bien"
 
 def Talk(message):
     # como parte de la interfaz de usuario se, usa la funcion pra que el motor de voz
@@ -162,13 +184,8 @@ def getInstrucciones(features):
         print(getPasos(steps[i]))
         Talk(getPasos(steps[i]))
 
-if __name__ == "__main__":
-
-    hilo = th.Thread(target=distancia)
-    hilo.start()
-    #mensaje = Listener()
-
-    # preguntamos que es lo que desea buscar
+def search_pois():
+     # preguntamos que es lo que desea buscar
     Talk("¿que ubicacion deseas buscar?")
     mensaje = input("¿que ubicacion deseas buscar?\t")
 
@@ -230,5 +247,48 @@ if __name__ == "__main__":
             Talk(" no te entendi")
     
     ruta = getRuta(coordinates, coor2) # cargamos las coordenadas y calculamos la ruta
-
     instrucciones = getInstrucciones(ruta["features"]) # mostramos las instrucciones a seguir
+
+if __name__ == "__main__":
+    # creamos un hilo que usa los sensores
+    hilo = th.Thread(target=distancia)
+    # inicializamos el hilo
+    hilo.start()
+
+    # hacemos que el programa se ejecute todo el tiempo
+    while True:
+        # solo se activa el programa si el usuario dice 'andromeda'
+        if "andromeda" in getSpeech():
+            # le mostramos todas las opciones
+            print("hola, ¿que deseas hacer?")
+            Talk("hola, ¿que deseas hacer?")
+            time.sleep(1)
+
+            print("Buscar puntos de interes")
+            Talk("Buscar puntos de interes")
+            time.sleep(0.2)
+
+            print("ir a tus locaciones favoritas")
+            Talk("ir a tus locaciones favoritas")
+            time.sleep(0.2)
+
+            print("agregar este lugar a tus favoritos")
+            Talk("agregar este lugar a tus favoritos")
+            time.sleep(0.2)
+
+            print("buscar por nombre")
+            Talk("buscar por nombre")
+
+            # obtenemos la respuesta
+            ans = getSpeech()
+            if "puntos de interes" in ans: # si quiere puntos de interes
+                search_pois()
+            elif "locaciones favoritas" in ans: # buscar sus locaciones favoritas
+                print("aun no contamos con esta opcion")
+                Talk("aun no contamos con esta opcion")
+            elif "agregar a mis favoritos" in ans: # agregar su ubicacion actual a favoritas
+                print("aun no contamos con esta opcion")
+                Talk("aun no contamos con esta opcion")
+            else:
+                print("respuesta fuera de lugar")
+                Talk("respuesta fuera de lugar")
