@@ -35,13 +35,17 @@ pip install -r requirements.txt
 # Como contribuir
 1. Crea un fork del repositorio en tu cuenta.
 2. Haz una rama de trabajo.
+
+<sub><sup>Retira las comillas, y pon el nombre de tu cambio</sup></sub>
 ```
-git branch <feature/nombre-de-tu-feature>
+git branch <feature-'nombreDeTuFeature'>
 ```
 3. Escribe tu código.
 4. Agrega tu nombre a la secciond e contribuidores de este documento.
 5. Sube el código a tu repositorio.
+
+<sub><sup>Retira las comillas, y pon el nombre de tu cambio</sup></sub>
 ```
-git push -u origin <feature/nombre-de-tu-feature>
+git push -u origin <feature-'nombreDeTuFeature'>
 ```
 6. Crea tu [pull-request](https://www.freecodecamp.org/espanol/news/como-hacer-tu-primer-pull-request-en-github/).
