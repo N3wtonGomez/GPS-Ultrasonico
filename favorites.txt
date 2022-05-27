@@ -1,0 +1,3 @@
+casa-[2, 3]
+trabajo-[3, 4]
+escuela-[4, 5]

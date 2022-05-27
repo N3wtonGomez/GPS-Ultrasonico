@@ -1,27 +1,59 @@
-from threading import Thread, Event
-from time import sleep
+'''
+ to 20 which is again used in Thread_A. This demonstrates that variable val is shared between two threads. Similarly variable flag is also shared between two threads.
+'''
+import threading
+import time
+c = threading.Condition()
+flag = 0      #shared between Thread_A and Thread_B
+val = 20
 
-event = Event()
+class Thread_A(threading.Thread):
+    def __init__(self, name):
+        threading.Thread.__init__(self)
+        self.name = name
 
-def modify_variable(var):
-    while True:
-        for i in range(len(var)):
-            var[i] += 1
-        if event.is_set():
-            break
-        sleep(.5)
-    print('Stop printing')
+    def run(self):
+        global flag
+        global val     #made global here
+        while True:
+            c.acquire()
+            if flag == 0:
+                print("A: val=" + str(val))
+                time.sleep(0.1)
+                flag = 1
+                val = 30
+                c.notify_all()
+            else:
+                c.wait()
+            c.release()
 
 
-my_var = [1, 2, 3]
-t = Thread(target=modify_variable, args=(my_var, ))
-t.start()
-while True:
-    try:
-        print(my_var)
-        sleep(1)
-    except KeyboardInterrupt:
-        event.set()
-        break
-t.join()
-print(my_var)
+class Thread_B(threading.Thread):
+    def __init__(self, name):
+        threading.Thread.__init__(self)
+        self.name = name
+
+    def run(self):
+        global flag
+        global val    #made global here
+        while True:
+            c.acquire()
+            if flag == 1:
+                print("B: val=" + str(val))
+                time.sleep(0.5)
+                flag = 0
+                val = 20
+                c.notify_all()
+            else:
+                c.wait()
+            c.release()
+
+
+a = Thread_A("myThread_name_A")
+b = Thread_B("myThread_name_B")
+
+b.start()
+a.start()
+
+a.join()
+b.join()

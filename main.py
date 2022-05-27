@@ -12,6 +12,8 @@
 
 # esta libreria nos permite escuchar a traves del microfono
 # para poder reconocer palabras y convertilas a texto
+from audioop import getsample
+import json
 import speech_recognition as sr
 # libreria que realiza la busqueda de los puntos de interes
 # ademas de generar la lista de indicaciones a traves de un geojson
@@ -22,7 +24,7 @@ import openrouteservice as ors
 #import RPi.GPIO as GPIO
 # se usa para poder hacer dos o mas procesos al mismo tiempo
 # de manera asincrona
-import threading as th
+from threading import Thread, Condition
 # nos permite traducir los strings en voz 
 import pyttsx3
 # control del tiempo
@@ -30,6 +32,8 @@ import time
 # manipulacion del archivo yml donde se encuentran almacenados
 # los codigos de clasificacion de los puntos de interes
 import yaml
+
+con = Condition()
 
 engine = pyttsx3.init() # inciamos el motor de voz
 # obtenemos la lista de las voces disponibles
@@ -49,12 +53,28 @@ client =  ors.Client(key=api_key) # hacemos la comunicacion con el sistema a tra
 # generamos una variable json con la informacion primaria del usuario,
 # el tipo de ubicacion que vamos a usar, en este caso  "point", referente
 # a que solo usaremos un par de coordenadas
-geojson = {
-    "type":"point",
-    "coordinates":[-102.262161, 21.879035] # coordenadas que cambiaran conforme el gps
-}
+coordinates = [0, 1]
+coordinates_flag = False
+
+
 # coordenadas variables de nuestra posicion gps
-coordinates = [-102.262161, 21.879035]
+
+def getGPS():
+    # esta funcion permite actualizar las coordenadas desde el gps
+    global coordinates # hacemos que la variable de coordenadas sea global
+    global coordinates_flag # hacemos la bandera global
+    while True:
+        con.acquire()
+        if not coordinates_flag:
+            # ! extraer coordenadas del gps
+            coordinates[0] += 1
+            coordinates[1] += 1
+
+            coordinates_flag = True
+            con.notify_all()
+        else:
+            con.wait()
+        con.release()
 
 # def distancia(): 
 #     GPIO.setmode(GPIO.BCM)
@@ -113,7 +133,8 @@ def Talk(message):
     engine.say(message) # al motor le mandamos el string 
     engine.runAndWait() # y esperamos a que termine de hablar
 
-def pois(id):
+def pois(id, geojson):
+    print(f'pois {geojson}')
     # esta funcion nos permite encontrar puntos de interes, cerca de nuestra ubicacion
     # necesita que le mandemos el id, de lo que deseamos buscar
     pois = client.places(
@@ -183,20 +204,29 @@ def getInstrucciones(features):
     # para cada instruccion sacamos los pasos y los leemos
     for i in range(0, len(steps)):
         print(getPasos(steps[i]))
-        Talk(getPasos(steps[i]))
+        Talk(getPasos(steps[i]))       
 
-def search_pois():
-     # preguntamos que es lo que desea buscar
-    Talk("what location you want to search?")
-    mensaje = input("what location you want to search?\t")
-
-    # cargamos las categorias
-    with open('test\categorias.yml', 'r') as f:
+def search_pois(coordinates, geojson):
+    print(f"goejson {geojson}")
+    
+    with open('categorias.yml', 'r') as f:
         yml = yaml.load(f, yaml.FullLoader)
 
+    for categoria in yml:
+        Talk(categoria)
+        print(categoria)
+    
+    # preguntamos que es lo que desea buscar
+    Talk("what location you want to search?")
+    print("what location you want to search?")
+    mensaje = getSpeech()
+
+    # cargamos las categorias
     # buscamos por claves generales, si se encontró lo que queriamos
     for clave in yml:
         if clave in mensaje:
+            print(clave)
+            Talk(clave)
             valores = yml.get(clave)
             break
     
@@ -208,7 +238,8 @@ def search_pois():
 
     # cual de las anteriores le interesa
     Talk("Specifically what do you want to look for?")
-    especifica = input("Specifically what do you want to look for?\t")
+    print("Specifically what do you want to look for?")
+    especifica = getSpeech()
     minicategorias = subcategorias[especifica]
     
     # mostramos las que contienen las subcategorias
@@ -218,10 +249,11 @@ def search_pois():
 
     # que es lo que necesita buscar
     Talk("say you're interest")
-    categoria_final = input("say you're interest\t")
+    print("say you're interest")
+    categoria_final = getSpeech()
     valor = minicategorias[categoria_final]
     
-    locaciones = pois(valor) # buscamos puntos de interes con esa informacion
+    locaciones = pois(valor, geojson=geojson) # buscamos puntos de interes con esa informacion
     pdi = locaciones["features"]
     if len(pdi) == 0: # si no se encuentra nada
         Talk("i did'nt find locations")
@@ -237,7 +269,8 @@ def search_pois():
     
     # le preguntamos a donde se quiere dirigir
     Talk("what its you're destiny?")
-    destino = input("what its you're destiny?\t").lower()
+    print("what its you're destiny?")
+    destino = getSpeech()
     #buscamos el destino
     for i in range(0, len(pdi)):
         if destino == getName(pdi[i]).lower():
@@ -248,7 +281,7 @@ def search_pois():
             Talk(" I did'nt get it")
     
     ruta = getRuta(coordinates, coor2) # cargamos las coordenadas y calculamos la ruta
-    instrucciones = getInstrucciones(ruta["features"]) # mostramos las instrucciones a seguir
+    getInstrucciones(ruta["features"]) # mostramos las instrucciones a seguir
 
 def Menu():
     # le mostramos todas las opciones del sistema
@@ -281,36 +314,110 @@ if __name__ == "__main__":
     # hilo = th.Thread(target=distancia)
     # # inicializamos el hilo
     # hilo.start()
+    
+    getGPS_thread = Thread(name=getGPS, target=getGPS)
+    getGPS_thread.start()
 
     # hacemos que el programa se ejecute todo el tiempo
     while True:
         # solo se activa el programa si el usuario dice 'andromeda'
-        if "andromeda" in getSpeech():
-            
-            Menu() # dice el menu
+        #if "andromeda" in getSpeech():
+        if True:   
+            # Menu() # dice el menu
 
             while True:
                 # obtenemos la respuesta
-                ans = getSpeech()
+                ans = input()
                 if "points of interest" in ans or "one" in ans: # si quiere puntos de interes
-                    search_pois() # buscamos puntos de interes
+                    con.acquire() # conseguimos el estado del hilo
+                    # si la bandera está levantada
+                    if coordinates_flag: 
+                        print(f'coordenadas {coordinates}') # imprimimos las coordenadas nuevas
+                        coordinates_flag = False # bajamos la bandera
+                        con.notify_all() # notificamos a los hilos
+                        
+                        geojson = { # creamos el json
+                            "type":"point",
+                            "coordinates":coordinates # coordenadas que cambiaran conforme el gps
+                        }
+                    else:
+                        con.wait() # esperamos a los hilos
+                    con.release() # soltamos
+
+                    search_pois(coordinates, geojson) # buscamos puntos de interes
                     break
 
-                elif "favorite locations" in ans or "two" in ans: # buscar sus locaciones favoritas
+                if "favorite locations" in ans or "two" in ans: # buscar sus locaciones favoritas
+                    print("where you want to go?")
+                    Talk("where you want to go?")
+
+                    destino = input()
+
+                    with open("favorites.txt", "r") as file:
+                        for line in file:
+                            info = str(line).split("-")
+                            print(info)
+                            if destino in info[0]:
+                                nombre = info[0]
+                                coordenadas = str(info[1]).split("\n")[0]
+                                break
+
+                    con.acquire() # conseguimos el estado del hilo
+                    # si la bandera está levantada
+                    if coordinates_flag: 
+                        print(f'coordenadas {coordinates}') # imprimimos las coordenadas nuevas
+                        coordinates_flag = False # bajamos la bandera
+                        con.notify_all() # notificamos a los hilos
+                        
+                        geojson = { # creamos el json
+                            "type":"point",
+                            "coordinates":coordinates # coordenadas que cambiaran conforme el gps
+                        }
+                    else:
+                        con.wait() # esperamos a los hilos
+                    con.release() # soltamos
+
+                    # * (las coordenadas actuales del usurio, las coordenadas de destino)
+                    ruta = getRuta(coordinates, coordenadas)
+                    # * sacamos las instrucciones
+                    getInstrucciones(ruta)
+
+                    break
+
+                if "add to my favorites" in ans or "three" in ans or "tree" in ans: # agregar su ubicacion actual a favoritas
+                    print("lets add you're actual location in you're favorites")
+                    Talk("lets add you're actual location in you're favorites")
+
+                    print("with wich name you want to save this location?")
+                    Talk("with wich name you want to save this location?")
+
+                    nombre = input()
+
+                    con.acquire() # conseguimos el estado del hilo
+                    # si la bandera está levantada
+                    if coordinates_flag: 
+                        print(f'coordenadas {coordinates}') # imprimimos las coordenadas nuevas
+                        coordinates_flag = False # bajamos la bandera
+                        con.notify_all() # notificamos a los hilos
+        
+                    else:
+                        con.wait() # esperamos a los hilos
+                    con.release() # soltamos
+
+                    with open("favorites.txt", "a") as file:
+                        file.write(f"{nombre}-{coordinates}\n")
+
+                    print(f"I saved this location as {nombre}")
+                    Talk(f"I saved this location as {nombre}")
+
+                    break
+
+                if "search by name" in ans or "four" in ans:
                     print("we dont have this option yet")
                     Talk("we dont have this option yet")
                     break
-
-                elif "add to my favorites" in ans or "three" in ans or "tree" in ans: # agregar su ubicacion actual a favoritas
-                    print("we dont have this option yet")
-                    Talk("we dont have this option yet")
-                    break
-
-                elif "search by name" in ans or "four" in ans:
-                    print("we dont have this option yet")
-                    Talk("we dont have this option yet")
-                    break
-                elif "repeat" in ans or "five" in ans:
+               
+                if "repeat" in ans or "five" in ans:
                     Menu()
 
                 else:
