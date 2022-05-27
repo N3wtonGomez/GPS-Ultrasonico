@@ -308,12 +308,11 @@ def Menu():
     print("five. Repeat menu")
     Talk("five. Repeat menu")
 
-
 if __name__ == "__main__":
     # creamos un hilo que usa los sensores
-    # hilo = th.Thread(target=distancia)
+    hilo = Thread(name="ultrasonico1",target=distancia)
     # # inicializamos el hilo
-    # hilo.start()
+    hilo.start()
     
     getGPS_thread = Thread(name=getGPS, target=getGPS)
     getGPS_thread.start()
@@ -327,7 +326,7 @@ if __name__ == "__main__":
 
             while True:
                 # obtenemos la respuesta
-                ans = input()
+                ans = getSpeech()
                 if "points of interest" in ans or "one" in ans: # si quiere puntos de interes
                     con.acquire() # conseguimos el estado del hilo
                     # si la bandera está levantada
@@ -351,7 +350,7 @@ if __name__ == "__main__":
                     print("where you want to go?")
                     Talk("where you want to go?")
 
-                    destino = input()
+                    destino = getSpeech()
 
                     with open("favorites.txt", "r") as file:
                         for line in file:
@@ -391,8 +390,7 @@ if __name__ == "__main__":
                     print("with wich name you want to save this location?")
                     Talk("with wich name you want to save this location?")
 
-                    nombre = input()
-
+                    nombre = getSpeech()
                     con.acquire() # conseguimos el estado del hilo
                     # si la bandera está levantada
                     if coordinates_flag: 
@@ -406,6 +404,7 @@ if __name__ == "__main__":
 
                     with open("favorites.txt", "a") as file:
                         file.write(f"{nombre}-{coordinates}\n")
+                        file.close()
 
                     print(f"I saved this location as {nombre}")
                     Talk(f"I saved this location as {nombre}")
