@@ -21,7 +21,7 @@ import openrouteservice as ors
 # libreria que controla los pines gpio de la raspberry
 # donde estan conectados los sensores ultrasonicos, 
 # adaptados a entradas usb, para facilidad de conexion
-#import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 # se usa para poder hacer dos o mas procesos al mismo tiempo
 # de manera asincrona
 from threading import Thread, Condition
@@ -76,30 +76,30 @@ def getGPS():
             con.wait()
         con.release()
 
-# def distancia(): 
-#     GPIO.setmode(GPIO.BCM)
-#     GPIO.setup(2,GPIO.OUT)
-#     GPIO.setup(20,GPIO.IN)
-#     GPIO.output(2,GPIO.LOW)
+def distancia(): 
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(2,GPIO.OUT)
+    GPIO.setup(20,GPIO.IN)
+    GPIO.output(2,GPIO.LOW)
 
-#     try: 
-#         while True:
-#             GPIO.output(2,GPIO.HIGH)
-#             time.sleep(0.00001)
-#             GPIO.output(2,GPIO.LOW)
-#             t1 = time.time()
-#             while GPIO.input(20) == GPIO.LOW:
-#                 t1 = time.time() 
-#             while GPIO.input(20) == GPIO.HIGH:
-#                 t2 = time.time()
-#             t = t2 - t1
-#             d = 170 * t
-#             print("Distancia: ", round(d,1), "metros")
-#             time.sleep(5)
+    try: 
+        while True:
+            GPIO.output(2,GPIO.HIGH)
+            time.sleep(0.00001)
+            GPIO.output(2,GPIO.LOW)
+            t1 = time.time()
+            while GPIO.input(20) == GPIO.LOW:
+                t1 = time.time() 
+            while GPIO.input(20) == GPIO.HIGH:
+                t2 = time.time()
+            t = t2 - t1
+            d = 170 * t
+            print("Distancia: ", round(d,1), "metros")
+            time.sleep(5)
 
-#     except: 
-#         GPIO.cleanup()
-#         print("Ha salido de modo sensado de distancia")
+    except: 
+        GPIO.cleanup()
+        print("Ha salido de modo sensado de distancia")
 
 def getSpeech():
     # esta funcion utiliza el microfono activo de la raspb
@@ -321,9 +321,9 @@ if __name__ == "__main__":
     # hacemos que el programa se ejecute todo el tiempo
     while True:
         # solo se activa el programa si el usuario dice 'andromeda'
-        #if "andromeda" in getSpeech():
-        if True:   
-            # Menu() # dice el menu
+        if "andromeda" in getSpeech():
+        #if True:   
+            Menu() # dice el menu
 
             while True:
                 # obtenemos la respuesta
