@@ -19,7 +19,7 @@ import openrouteservice as ors
 # libreria que controla los pines gpio de la raspberry
 # donde estan conectados los sensores ultrasonicos, 
 # adaptados a entradas usb, para facilidad de conexion
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
 # se usa para poder hacer dos o mas procesos al mismo tiempo
 # de manera asincrona
 import threading as th
@@ -56,54 +56,55 @@ geojson = {
 # coordenadas variables de nuestra posicion gps
 coordinates = [-102.262161, 21.879035]
 
-def distancia(): 
+# def distancia(): 
+#     GPIO.setmode(GPIO.BCM)
+#     GPIO.setup(2,GPIO.OUT)
+#     GPIO.setup(20,GPIO.IN)
+#     GPIO.output(2,GPIO.LOW)
 
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(2,GPIO.OUT)
-    GPIO.setup(20,GPIO.IN)
-    GPIO.output(2,GPIO.LOW)
+#     try: 
+#         while True:
+#             GPIO.output(2,GPIO.HIGH)
+#             time.sleep(0.00001)
+#             GPIO.output(2,GPIO.LOW)
+#             t1 = time.time()
+#             while GPIO.input(20) == GPIO.LOW:
+#                 t1 = time.time() 
+#             while GPIO.input(20) == GPIO.HIGH:
+#                 t2 = time.time()
+#             t = t2 - t1
+#             d = 170 * t
+#             print("Distancia: ", round(d,1), "metros")
+#             time.sleep(5)
 
-    try: 
-        while True:
-            GPIO.output(2,GPIO.HIGH)
-            time.sleep(0.00001)
-            GPIO.output(2,GPIO.LOW)
-            t1 = time.time()
-            while GPIO.input(20) == GPIO.LOW:
-                t1 = time.time() 
-            while GPIO.input(20) == GPIO.HIGH:
-                t2 = time.time()
-            t = t2 - t1
-            d = 170 * t
-            print("Distancia: ", round(d,1), "metros")
-            time.sleep(5)
-
-    except: 
-        GPIO.cleanup()
-        print("Ha salido de modo sensado de distancia")
+#     except: 
+#         GPIO.cleanup()
+#         print("Ha salido de modo sensado de distancia")
 
 def getSpeech():
     # esta funcion utiliza el microfono activo de la raspb
     # para poder entender lo que dice la persona
     listener = sr.Recognizer() # inicializamos el engine
-    # debemmos ingresar la funcion dentro de un try:catch
-    try:
-        # con el microfono como fuente empezamos a escuchar
-        with sr.Microphone() as source:
-            # agregamos un filtro al ruido del ambiente
-            pc = listener.adjust_for_ambient_noise(source)
+    # con el microfono como fuente empezamos a escuchar
+    with sr.Microphone() as source:
+        # agregamos un filtro al ruido del ambiente
+        listener.adjust_for_ambient_noise(source)
+        # escuchamos
+        audio = listener.listen(source)
+        # debemmos ingresar la funcion dentro de un try:catch
+        try:
             # usamos el reconocedor de bing, pues el de google
             # ya no puede ser usado de manera gratuita
-            rec = listener.recognize_bing(
-                pc, # queremos escuchar el ruido con filtro
-                lenguage = "es" # le decimos que queremos escuchar en españól
+            rec = listener.recognize_google(
+                audio # queremos escuchar el ruido con filtro
             )
             # nos devolverá un string, lo que pondremos en letras minusculas
             # y devolvemos esta informacion 
             return rec.lower() 
-    except Exception as e:
-        # si no se entiende lo que dice, o no funciona, se retorna el mensaje 
-        return "no te entendí bien"
+        except Exception as e:
+            # si no se entiende lo que dice, o no funciona, se retorna el mensaje 
+            print(e)
+            return "no te entendí bien"
 
 def Talk(message):
     # como parte de la interfaz de usuario se, usa la funcion pra que el motor de voz
@@ -172,11 +173,11 @@ def getInstrucciones(features):
     # convertimos los metros que nos da a km
     km =  int(pasos["distance"])/1000
     # impirmimos en pantalla y hablamos la duracion del trayecto
-    print("su viaje durará ", round(minutos) , " minutos")
-    Talk(f"su viaje durará {round(minutos)} minutos")
+    print("your trip will last ", round(minutos) , " minutes")
+    Talk(f"your trip will last {round(minutos)} minutes")
     # impirmimos en pantalla y hablamos la distancia del trayecto
-    print("su viaje será de ", km, " kilometros")
-    Talk(f"su viaje será de {km} kilometros")
+    print("you will walk ", km, " kilometers")
+    Talk(f"you will walk {km} kilometers")
     # buscamos los pasos exactos que necesita nuestro viaje
     steps = pasos["steps"]
     # para cada instruccion sacamos los pasos y los leemos
@@ -186,8 +187,8 @@ def getInstrucciones(features):
 
 def search_pois():
      # preguntamos que es lo que desea buscar
-    Talk("¿que ubicacion deseas buscar?")
-    mensaje = input("¿que ubicacion deseas buscar?\t")
+    Talk("what location you want to search?")
+    mensaje = input("what location you want to search?\t")
 
     # cargamos las categorias
     with open('test\categorias.yml', 'r') as f:
@@ -206,8 +207,8 @@ def search_pois():
         print(subcategoria)
 
     # cual de las anteriores le interesa
-    Talk("¿especificamente que desesas buscar?")
-    especifica = input("¿especificamente que desesas buscar?\t")
+    Talk("Specifically what do you want to look for?")
+    especifica = input("Specifically what do you want to look for?\t")
     minicategorias = subcategorias[especifica]
     
     # mostramos las que contienen las subcategorias
@@ -216,18 +217,18 @@ def search_pois():
         print(minicategoria)
 
     # que es lo que necesita buscar
-    Talk("Ingresa tu interes")
-    categoria_final = input("Ingresa tu interes\t")
+    Talk("say you're interest")
+    categoria_final = input("say you're interest\t")
     valor = minicategorias[categoria_final]
     
     locaciones = pois(valor) # buscamos puntos de interes con esa informacion
     pdi = locaciones["features"]
     if len(pdi) == 0: # si no se encuentra nada
-        Talk("No encontramos lugares")
-        print("No encontramos lugares")
+        Talk("i did'nt find locations")
+        print("i did'nt find locations")
     else:
-        Talk("encontré estos lugares de interes")
-        print("encontré estos lugares de interes")
+        Talk("I find this points of interest")
+        print("I find this points of interest")
         # mostramos los nombres
         for i in range(0, len(pdi)):
             Talk(getName(pdi[i])) 
@@ -235,60 +236,86 @@ def search_pois():
             print("-------------------")
     
     # le preguntamos a donde se quiere dirigir
-    Talk("¿cual es tu destino?")
-    destino = input("¿cual es tu destino?\t").lower()
+    Talk("what its you're destiny?")
+    destino = input("what its you're destiny?\t").lower()
     #buscamos el destino
     for i in range(0, len(pdi)):
         if destino == getName(pdi[i]).lower():
             coor2 = getCoordinates(pdi[i]) #obtenemos coordenadas
             break
         else:
-            print(" no te entendi")
-            Talk(" no te entendi")
+            print(" I did'nt get it")
+            Talk(" I did'nt get it")
     
     ruta = getRuta(coordinates, coor2) # cargamos las coordenadas y calculamos la ruta
     instrucciones = getInstrucciones(ruta["features"]) # mostramos las instrucciones a seguir
 
+def Menu():
+    # le mostramos todas las opciones del sistema
+    print("hello, where we are going today?")
+    Talk("hello, where we are going today?")
+    time.sleep(0.3)
+
+    print("one. Search points of interest")
+    Talk("one. Search points of interest")
+    time.sleep(0.1)
+
+    print("two. visit my favorite locations")
+    Talk("two. visit my favorite locations")
+    time.sleep(0.1)
+
+    print("three. add this place to my favorites")
+    Talk("three. add this place to my favorites")
+    time.sleep(0.1)
+
+    print("four. search by name")
+    Talk("four. search by name")
+    time.sleep(0.1)
+
+    print("five. Repeat menu")
+    Talk("five. Repeat menu")
+
+
 if __name__ == "__main__":
     # creamos un hilo que usa los sensores
-    hilo = th.Thread(target=distancia)
-    # inicializamos el hilo
-    hilo.start()
+    # hilo = th.Thread(target=distancia)
+    # # inicializamos el hilo
+    # hilo.start()
 
     # hacemos que el programa se ejecute todo el tiempo
     while True:
         # solo se activa el programa si el usuario dice 'andromeda'
         if "andromeda" in getSpeech():
-            # le mostramos todas las opciones
-            print("hola, ¿que deseas hacer?")
-            Talk("hola, ¿que deseas hacer?")
-            time.sleep(1)
+            
+            Menu() # dice el menu
 
-            print("Buscar puntos de interes")
-            Talk("Buscar puntos de interes")
-            time.sleep(0.2)
+            while True:
+                # obtenemos la respuesta
+                ans = getSpeech()
+                if "points of interest" in ans or "one" in ans: # si quiere puntos de interes
+                    search_pois() # buscamos puntos de interes
+                    break
 
-            print("ir a tus locaciones favoritas")
-            Talk("ir a tus locaciones favoritas")
-            time.sleep(0.2)
+                elif "favorite locations" in ans or "two" in ans: # buscar sus locaciones favoritas
+                    print("we dont have this option yet")
+                    Talk("we dont have this option yet")
+                    break
 
-            print("agregar este lugar a tus favoritos")
-            Talk("agregar este lugar a tus favoritos")
-            time.sleep(0.2)
+                elif "add to my favorites" in ans or "three" in ans or "tree" in ans: # agregar su ubicacion actual a favoritas
+                    print("we dont have this option yet")
+                    Talk("we dont have this option yet")
+                    break
 
-            print("buscar por nombre")
-            Talk("buscar por nombre")
+                elif "search by name" in ans or "four" in ans:
+                    print("we dont have this option yet")
+                    Talk("we dont have this option yet")
+                    break
+                elif "repeat" in ans or "five" in ans:
+                    Menu()
 
-            # obtenemos la respuesta
-            ans = getSpeech()
-            if "puntos de interes" in ans: # si quiere puntos de interes
-                search_pois()
-            elif "locaciones favoritas" in ans: # buscar sus locaciones favoritas
-                print("aun no contamos con esta opcion")
-                Talk("aun no contamos con esta opcion")
-            elif "agregar a mis favoritos" in ans: # agregar su ubicacion actual a favoritas
-                print("aun no contamos con esta opcion")
-                Talk("aun no contamos con esta opcion")
-            else:
-                print("respuesta fuera de lugar")
-                Talk("respuesta fuera de lugar")
+                else:
+                    print("I did'nt get it")
+                    Talk("I did'nt get it")
+                    continue
+        else:
+            continue
