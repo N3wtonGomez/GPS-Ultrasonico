@@ -12,8 +12,6 @@
 
 # esta libreria nos permite escuchar a traves del microfono
 # para poder reconocer palabras y convertilas a texto
-from audioop import getsample
-import json
 import speech_recognition as sr
 # libreria que realiza la busqueda de los puntos de interes
 # ademas de generar la lista de indicaciones a traves de un geojson
@@ -63,20 +61,20 @@ def getGPS():
     # esta funcion permite actualizar las coordenadas desde el gps
     global coordinates # hacemos que la variable de coordenadas sea global
     global coordinates_flag # hacemos la bandera global
-    while True:
-        con.acquire()
-        if not coordinates_flag:
-            # ! extraer coordenadas del gps
-            coordinates[0] += 1
-            coordinates[1] += 1
+    while True: # corremos en segundo plano
+        con.acquire() # adquirimos la informacion
+        if not coordinates_flag: # si no es true la bandera
+            #todo extraer coordenadas del gps
+            coordinates = [-102.29037422704867, 21.793019434668885] #! coordenadas de campus sur
 
-            coordinates_flag = True
-            con.notify_all()
+            coordinates_flag = True # levantamos la vandera
+            con.notify_all() # notificamos a todas la informacion
         else:
-            con.wait()
+            con.wait() # esperamos la informacion
         con.release()
 
 def distancia(): 
+    print("modo de sensado, activado")
     GPIO.setmode(GPIO.BCM)
     GPIO.setup(2,GPIO.OUT)
     GPIO.setup(20,GPIO.IN)
@@ -95,7 +93,8 @@ def distancia():
             t = t2 - t1
             d = 170 * t
             print("Distancia: ", round(d,1), "metros")
-            time.sleep(5)
+            Talk(f"hay un objeto a {round(d, 1)}")
+            time.sleep(1)
 
     except: 
         GPIO.cleanup()
@@ -134,7 +133,6 @@ def Talk(message):
     engine.runAndWait() # y esperamos a que termine de hablar
 
 def pois(id, geojson):
-    print(f'pois {geojson}')
     # esta funcion nos permite encontrar puntos de interes, cerca de nuestra ubicacion
     # necesita que le mandemos el id, de lo que deseamos buscar
     pois = client.places(
@@ -202,9 +200,12 @@ def getInstrucciones(features):
     # buscamos los pasos exactos que necesita nuestro viaje
     steps = pasos["steps"]
     # para cada instruccion sacamos los pasos y los leemos
+    #! ingresar algoritmo para la coordinacion de coordenadas con el avance del gps,
+    #! para dar la siguiente instruccion
     for i in range(0, len(steps)):
         print(getPasos(steps[i]))
-        Talk(getPasos(steps[i]))       
+        Talk(getPasos(steps[i])) 
+        time.sleep(100) #* vamos a hacerlo esperar 100 segundos para que no se den cuenta que no avanza
 
 def search_pois(coordinates, geojson):
     print(f"goejson {geojson}")

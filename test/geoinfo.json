@@ -78,7 +78,8 @@
                         "duration": 277.7, 
                         "type": 0, 
                         "instruction": "Turn left onto Calle Beethoven", 
-                        "name": "Calle Beethoven", "way_points": [27, 35]
+                        "name": "Calle Beethoven", 
+                        "way_points": [27, 35]
                     },
                     {
                         "distance": 137.9, 
