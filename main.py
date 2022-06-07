@@ -230,9 +230,8 @@ def getInstrucciones(features):
 
     print(getPasos(steps[0])) # mostramos el primer paso 
     Talk(getPasos(steps[0]))
-    sinLlegar = True
     i = 1
-    while sinLlegar:
+    while True:
         con.acquire() # conseguimos el estado del hilo
         # si la bandera está levantada
         if coordinates_flag: 
@@ -243,7 +242,7 @@ def getInstrucciones(features):
             con.wait() # esperamos a los hilos
         con.release() # soltamos
 
-        numcoor = getPoints() # obtenemos la posicion de la coordenada en la lista
+        numcoor = getPoints(steps[i]) # obtenemos la posicion de la coordenada en la lista
         coor = coordenadas[numcoor] # obtenemos las coordenadas necesarias
         # si las coordenadas del usuario son las mismas que la de los pasos continuamos
         if coor == coordinates: 
