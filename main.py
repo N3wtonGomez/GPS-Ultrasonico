@@ -19,7 +19,7 @@ import openrouteservice as ors
 # libreria que controla los pines gpio de la raspberry
 # donde estan conectados los sensores ultrasonicos, 
 # adaptados a entradas usb, para facilidad de conexion
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
 # se usa para poder hacer dos o mas procesos al mismo tiempo
 # de manera asincrona
 from threading import Thread, Condition
@@ -30,6 +30,12 @@ import time
 # manipulacion del archivo yml donde se encuentran almacenados
 # los codigos de clasificacion de los puntos de interes
 import yaml
+# cargamos la libreria json
+import json
+import os
+
+import serial
+import pynmea2
 
 con = Condition()
 
@@ -54,9 +60,12 @@ client =  ors.Client(key=api_key) # hacemos la comunicacion con el sistema a tra
 coordinates = [0, 1]
 coordinates_flag = False
 
+GPIO.setmode(GPIO.BCM) # se activa el modo gpio
+GPIO.setup(2,GPIO.OUT) # se pone el gpio2 de forma de salida
+GPIO.setup(20,GPIO.IN) # se pone el gpio 20 de manera de lectura
+GPIO.output(2,GPIO.LOW) # se pone en 0 logico el pin 2
 
 # coordenadas variables de nuestra posicion gps
-
 def getGPS():
     # esta funcion permite actualizar las coordenadas desde el gps
     global coordinates # hacemos que la variable de coordenadas sea global
@@ -64,8 +73,19 @@ def getGPS():
     while True: # corremos en segundo plano
         con.acquire() # adquirimos la informacion
         if not coordinates_flag: # si no es true la bandera
-            #todo extraer coordenadas del gps
-            coordinates = [-102.29037422704867, 21.793019434668885] #! coordenadas de campus sur
+            
+            port="/dev/ttyAMA0" # direccion del sensor gps
+            ser=serial.Serial(port, baudrate=9600, timeout=0.5) # leemos el sesnor
+            dataout = pynmea2.NMEAStreamReader()
+            newdata=ser.readline() # obtenemos la informacion del sensor
+
+            # si la informacion tiene como llave GPRMC la leemos
+            if newdata[0:6] == "$GPRMC": 
+                newmsg=pynmea2.parse(newdata) # decriptamos la infor
+                lat=newmsg.latitude # obtenemos latitud
+                lng=newmsg.longitude # obtenemos longitud
+                # guardamos esto en una lista
+                coordinates = [float(lat), float(lng)]
 
             coordinates_flag = True # levantamos la vandera
             con.notify_all() # notificamos a todas la informacion
@@ -74,31 +94,37 @@ def getGPS():
         con.release()
 
 def distancia(): 
-    print("modo de sensado, activado")
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(2,GPIO.OUT)
-    GPIO.setup(20,GPIO.IN)
-    GPIO.output(2,GPIO.LOW)
-
     try: 
-        while True:
+        while True: # corremos de manera continua el hilo
+            # enviamos una señal ultrasonica, poniendo en alto el pin del trigger
             GPIO.output(2,GPIO.HIGH)
+            # esperamos 10 microsegundos
             time.sleep(0.00001)
-            GPIO.output(2,GPIO.LOW)
-            t1 = time.time()
-            while GPIO.input(20) == GPIO.LOW:
+            GPIO.output(2,GPIO.LOW) # apagamos el trigger
+            t1 = time.time() # obtenemos el tiempo inmediato desde que lo apagamos
+            # si el gpio recibe algo, guardamos el tiempo
+            while GPIO.input(20) == GPIO.LOW: 
                 t1 = time.time() 
             while GPIO.input(20) == GPIO.HIGH:
                 t2 = time.time()
-            t = t2 - t1
+            t = t2 - t1 # tomamos el tiempo total que tardó la onda en ir al objeto y volver
+            # tenemos que la velocidad del sonido es 343.2 m/s, 
+            # ademas partimos de la ecuacion basica de d = v * t
+            # nuestro sistema saca tendria el doble de distancia, porque la onda tiene que ir y volver
+            # por loq que para nuestro sistema la ecuacion quedaria 2d = 343.2(m/s) * t(s)
+            # despejando queda que d = 170 * t
             d = 170 * t
-            print("Distancia: ", round(d,1), "metros")
-            Talk(f"hay un objeto a {round(d, 1)}")
+            # si la distancia es menor a 5 metros, avisamos al usuario
+            if d < 5:
+                print("Distancia: ", round(d,1), "metros")
+                Talk(f"hay un objeto a {round(d, 1)}")
+            else:
+                continue
             time.sleep(1)
-
     except: 
         GPIO.cleanup()
         print("Ha salido de modo sensado de distancia")
+        Talk("Ha salido de modo sensado de distancia")
 
 def getSpeech():
     # esta funcion utiliza el microfono activo de la raspb
@@ -177,6 +203,9 @@ def getPasos(info):
     # vamos a devolver al usario por cada paso, la instruccion necesaria
     return info["instruction"]
 
+def getPoints(info):
+    return info["way_points"][1]
+
 def getInstrucciones(features):
     # con el archivo yml vamos a leer la informacion de nuestro viaje
     secciones = features[0] # la primer seccion es la que nos da las instrucciones
@@ -200,15 +229,38 @@ def getInstrucciones(features):
     # buscamos los pasos exactos que necesita nuestro viaje
     steps = pasos["steps"]
     # para cada instruccion sacamos los pasos y los leemos
-    #! ingresar algoritmo para la coordinacion de coordenadas con el avance del gps,
-    #! para dar la siguiente instruccion
-    for i in range(0, len(steps)):
-        print(getPasos(steps[i]))
-        Talk(getPasos(steps[i])) 
-        time.sleep(100) #* vamos a hacerlo esperar 100 segundos para que no se den cuenta que no avanza
+    geometria = secciones["geometry"]
+    coordenadas = geometria["coordinates"]
+
+    print(getPasos(steps[0])) # mostramos el primer paso 
+    Talk(getPasos(steps[0]))
+    sinLlegar = True
+    i = 1
+    while sinLlegar:
+        con.acquire() # conseguimos el estado del hilo
+        # si la bandera está levantada
+        if coordinates_flag: 
+            coordinates_flag = False # bajamos la bandera
+            con.notify_all() # notificamos a los hilos
+
+        else:
+            con.wait() # esperamos a los hilos
+        con.release() # soltamos
+
+        numcoor = getPoints() # obtenemos la posicion de la coordenada en la lista
+        coor = coordenadas[numcoor] # obtenemos las coordenadas necesarias
+        # si las coordenadas del usuario son las mismas que la de los pasos continuamos
+        if coor == coordinates: 
+            print(getPasos(steps[i]))
+            Talk(getPasos(steps[i]))
+            i = i + 1  # agregamos uno al contador, para ir al siguiente paso
+        else:
+            continue
+            
+        if len(steps) == i: # si el contador es igual al numero de pasos, terminamos el conteo
+            break
 
 def search_pois(coordinates, geojson):
-    print(f"goejson {geojson}")
     
     with open('categorias.yml', 'r') as f:
         yml = yaml.load(f, yaml.FullLoader)
@@ -242,7 +294,7 @@ def search_pois(coordinates, geojson):
     print("Specifically what do you want to look for?")
     especifica = getSpeech()
     minicategorias = subcategorias[especifica]
-    
+
     # mostramos las que contienen las subcategorias
     for minicategoria in minicategorias:
         Talk(minicategoria)
@@ -310,12 +362,17 @@ def Menu():
     Talk("five. Repeat menu")
 
 if __name__ == "__main__":
+    # informamos al usario que se activo correctamente el modo de snesado
+    print("modo de sensado, activado")
+    Talk("modo de sensado, activado")
     # creamos un hilo que usa los sensores
     hilo = Thread(name="ultrasonico1",target=distancia)
-    # # inicializamos el hilo
+    # inicializamos el hilo
     hilo.start()
     
-    getGPS_thread = Thread(name=getGPS, target=getGPS)
+    # cremaos un hilo para obtener los datos del gps
+    getGPS_thread = Thread(name='getGPS', target=getGPS)
+    # iniciamos el hilo
     getGPS_thread.start()
 
     # hacemos que el programa se ejecute todo el tiempo
@@ -328,11 +385,11 @@ if __name__ == "__main__":
             while True:
                 # obtenemos la respuesta
                 ans = getSpeech()
+
                 if "points of interest" in ans or "one" in ans: # si quiere puntos de interes
                     con.acquire() # conseguimos el estado del hilo
                     # si la bandera está levantada
                     if coordinates_flag: 
-                        print(f'coordenadas {coordinates}') # imprimimos las coordenadas nuevas
                         coordinates_flag = False # bajamos la bandera
                         con.notify_all() # notificamos a los hilos
                         
@@ -353,19 +410,14 @@ if __name__ == "__main__":
 
                     destino = getSpeech()
 
-                    with open("favorites.txt", "r") as file:
-                        for line in file:
-                            info = str(line).split("-")
-                            print(info)
-                            if destino in info[0]:
-                                nombre = info[0]
-                                coordenadas = str(info[1]).split("\n")[0]
-                                break
+                    with open("favorites.json", "r") as file:
+                        json  = json.load(file)
+                        coordenadas = json[destino]
+                        file.close()
 
                     con.acquire() # conseguimos el estado del hilo
                     # si la bandera está levantada
                     if coordinates_flag: 
-                        print(f'coordenadas {coordinates}') # imprimimos las coordenadas nuevas
                         coordinates_flag = False # bajamos la bandera
                         con.notify_all() # notificamos a los hilos
                         
@@ -380,7 +432,8 @@ if __name__ == "__main__":
                     # * (las coordenadas actuales del usurio, las coordenadas de destino)
                     ruta = getRuta(coordinates, coordenadas)
                     # * sacamos las instrucciones
-                    getInstrucciones(ruta)
+                    features_de_ruta = ruta["features"]
+                    getInstrucciones(features_de_ruta)
 
                     break
 
@@ -395,17 +448,30 @@ if __name__ == "__main__":
                     con.acquire() # conseguimos el estado del hilo
                     # si la bandera está levantada
                     if coordinates_flag: 
-                        print(f'coordenadas {coordinates}') # imprimimos las coordenadas nuevas
                         coordinates_flag = False # bajamos la bandera
                         con.notify_all() # notificamos a los hilos
         
                     else:
                         con.wait() # esperamos a los hilos
                     con.release() # soltamos
+                    
+                    if os.path.exists("favorites.json"):
+                        with open("favorites.json", "r") as file:
+                            data = json.load(file)
+                            data.update({nombre:coordinates})
+                            file.close()
+                    
+                        os.remove("favorites.json")
 
-                    with open("favorites.txt", "a") as file:
-                        file.write(f"{nombre}-{coordinates}\n")
-                        file.close()
+                        with open("favorites.json", 'a') as file:
+                            file.write(json.dumps(data))
+                            file.close()
+                    
+                    else:
+                        file_data = {nombre: coordinates}
+                        with open("favorites.json", 'a') as file:
+                            json.dump(file_data, file)
+                            file.close()
 
                     print(f"I saved this location as {nombre}")
                     Talk(f"I saved this location as {nombre}")
