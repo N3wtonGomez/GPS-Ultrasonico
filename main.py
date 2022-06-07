@@ -19,7 +19,7 @@ import openrouteservice as ors
 # libreria que controla los pines gpio de la raspberry
 # donde estan conectados los sensores ultrasonicos, 
 # adaptados a entradas usb, para facilidad de conexion
-#import RPi.GPIO as GPIO
+import RPi.GPIO as GPIO
 # se usa para poder hacer dos o mas procesos al mismo tiempo
 # de manera asincrona
 from threading import Thread, Condition
@@ -95,32 +95,28 @@ def getGPS():
 
 def distancia(): 
     try: 
-        while True: # corremos de manera continua el hilo
-            # enviamos una señal ultrasonica, poniendo en alto el pin del trigger
-            GPIO.output(2,GPIO.HIGH)
-            # esperamos 10 microsegundos
-            time.sleep(0.00001)
-            GPIO.output(2,GPIO.LOW) # apagamos el trigger
-            t1 = time.time() # obtenemos el tiempo inmediato desde que lo apagamos
-            # si el gpio recibe algo, guardamos el tiempo
-            while GPIO.input(20) == GPIO.LOW: 
-                t1 = time.time() 
-            while GPIO.input(20) == GPIO.HIGH:
-                t2 = time.time()
-            t = t2 - t1 # tomamos el tiempo total que tardó la onda en ir al objeto y volver
-            # tenemos que la velocidad del sonido es 343.2 m/s, 
-            # ademas partimos de la ecuacion basica de d = v * t
-            # nuestro sistema saca tendria el doble de distancia, porque la onda tiene que ir y volver
-            # por loq que para nuestro sistema la ecuacion quedaria 2d = 343.2(m/s) * t(s)
-            # despejando queda que d = 170 * t
-            d = 170 * t
-            # si la distancia es menor a 5 metros, avisamos al usuario
-            if d < 5:
-                print("Distancia: ", round(d,1), "metros")
-                Talk(f"hay un objeto a {round(d, 1)}")
-            else:
-                continue
-            time.sleep(1)
+        # enviamos una señal ultrasonica, poniendo en alto el pin del trigger
+        GPIO.output(2,GPIO.HIGH)
+        # esperamos 10 microsegundos
+        time.sleep(0.00001)
+        GPIO.output(2,GPIO.LOW) # apagamos el trigger
+        t1 = time.time() # obtenemos el tiempo inmediato desde que lo apagamos
+        # si el gpio recibe algo, guardamos el tiempo
+        while GPIO.input(20) == GPIO.LOW: 
+            t1 = time.time() 
+        while GPIO.input(20) == GPIO.HIGH:
+            t2 = time.time()
+        t = t2 - t1 # tomamos el tiempo total que tardó la onda en ir al objeto y volver
+        # tenemos que la velocidad del sonido es 343.2 m/s, 
+        # ademas partimos de la ecuacion basica de d = v * t
+        # nuestro sistema saca tendria el doble de distancia, porque la onda tiene que ir y volver
+        # por loq que para nuestro sistema la ecuacion quedaria 2d = 343.2(m/s) * t(s)
+        # despejando queda que d = 170 * t
+        d = 170 * t
+        # si la distancia es menor a 5 metros, avisamos al usuario
+        if d < 5:
+            print("Distancia: ", round(d,1), "metros")
+            Talk(f"hay un objeto a {round(d, 1)}")
     except: 
         GPIO.cleanup()
         print("Ha salido de modo sensado de distancia")
@@ -260,6 +256,8 @@ def getInstrucciones(features):
         if len(steps) == i: # si el contador es igual al numero de pasos, terminamos el conteo
             break
 
+        distancia()
+
 def search_pois(coordinates, geojson):
     
     with open('categorias.yml', 'r') as f:
@@ -365,10 +363,6 @@ if __name__ == "__main__":
     # informamos al usario que se activo correctamente el modo de snesado
     print("modo de sensado, activado")
     Talk("modo de sensado, activado")
-    # creamos un hilo que usa los sensores
-    hilo = Thread(name="ultrasonico1",target=distancia)
-    # inicializamos el hilo
-    hilo.start()
     
     # cremaos un hilo para obtener los datos del gps
     getGPS_thread = Thread(name='getGPS', target=getGPS)
