@@ -246,9 +246,9 @@ def getInstrucciones(features):
         coor = coordenadas[numcoor] # obtenemos las coordenadas necesarias
         # si las coordenadas del usuario son las mismas que la de los pasos continuamos
         if coor == coordinates: 
+            i = i + 1  # agregamos uno al contador, para ir al siguiente paso
             print(getPasos(steps[i]))
             Talk(getPasos(steps[i]))
-            i = i + 1  # agregamos uno al contador, para ir al siguiente paso
         else:
             continue
             
